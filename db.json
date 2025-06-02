@@ -1,0 +1,15 @@
+{
+  "products": [
+    {
+      "id": "1748897894263",
+      "title": "Artem",
+      "price": "123",
+      "checked": true
+    },
+    {
+      "id": "1748899256930",
+      "title": "test",
+      "price": "100"
+    }
+  ]
+}

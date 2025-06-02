@@ -1,0 +1,18 @@
+.new-product-page {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.new-product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
