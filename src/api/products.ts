@@ -1,3 +1,5 @@
+import Http from '@/services/http';
+
 type Product = {
   id: string;
   title: string;
@@ -5,43 +7,29 @@ type Product = {
   checked?: boolean;
 };
 
-const API_URL = 'http://localhost:3000';
-
 const fetchProducts = async (): Promise<Array<Product>> => {
-  const resp = await fetch(`${API_URL}/products`);
-  return await resp.json();
+  const resp = await Http.get(`/products`);
+  return resp.data;
 };
 
 const fetchProduct = async (id: string): Promise<Product> => {
-  const resp = await fetch(`${API_URL}/products/${id}`);
-
-  if (!resp.ok) {
-    throw new Error(`Product with id ${id} not found`);
-  }
-  return await resp.json();
+  const resp = await Http.get(`/products/${id}`);
+  return resp.data;
 };
 
 const addProduct = async (data: Product) => {
-  const resp = await fetch(`${API_URL}/products`, {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-  return await resp.json();
+  const resp = await Http.post(`/products`, data);
+  return resp.data;
 };
 
 const updateProduct = async ({ id, data }: { id: string; data: Partial<Product> }) => {
-  const resp = await fetch(`${API_URL}/products/${id}`, {
-    method: 'PATCH',
-    body: JSON.stringify(data),
-  });
-  return await resp.json();
+  const resp = await Http.patch(`/products/${id}`, data);
+  return resp.data;
 };
 
 const deleteProduct = async (id: string) => {
-  const resp = await fetch(`${API_URL}/products/${id}`, {
-    method: 'DELETE',
-  });
-  return await resp.json();
+  const resp = await Http.delete(`/products/${id}`);
+  return resp.data;
 };
 
 export default {

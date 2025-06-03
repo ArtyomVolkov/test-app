@@ -1,6 +1,6 @@
 @reference "tailwindcss";
 
-.product-list {
+.product-list-page {
   display: flex;
   flex-direction: column;
   padding: 15px;
@@ -48,9 +48,9 @@
 }
 
 .list-item {
+  display: flex;
   width: 100%;
   gap: 16px;
   padding: 10px;
   align-items: center;
-  @apply flex;
 }

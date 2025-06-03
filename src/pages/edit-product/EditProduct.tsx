@@ -1,13 +1,15 @@
 import './EditProduct.css';
 import { useEffect, useState, type ChangeEvent, type MouseEvent } from 'react';
+import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import productsApi from '@/api/products';
 
 const EditProduct = () => {
+  const queryClient = useQueryClient();
   const navigation = useNavigate();
   const params = useParams();
   const [formData, setFormData] = useState({
@@ -26,8 +28,10 @@ const EditProduct = () => {
     mutationFn: async (data: { id: string; data: Partial<typeof formData> }) => {
       return await productsApi.updateProduct(data);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       navigation('/products');
+      await queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('Product update success');
     },
   });
 
@@ -61,7 +65,7 @@ const EditProduct = () => {
 
   return (
     <div className="edit-product-page">
-      <h1>Edit Product</h1>
+      <h1>Update Product</h1>
       <form className="new-product-form">
         <div className="form-group">
           <Label htmlFor="title">Product Name</Label>
@@ -72,7 +76,7 @@ const EditProduct = () => {
           <Input type="number" id="price" name="price" value={formData.price} onChange={onChangeFormField} />
         </div>
         <Button type="submit" onClick={onSubmit}>
-          Submit
+          Update product
         </Button>
       </form>
     </div>

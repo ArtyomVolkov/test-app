@@ -1,16 +1,20 @@
 # Test app (Vite)
 
 ## Technologies:
-* [Typescript](https://www.typescriptlang.org/)
-* [React](https://en.reactjs.org/)
-* [Tailwind](https://tailwindcss.com/)
+
+- [Typescript](https://www.typescriptlang.org/)
+- [React](https://en.reactjs.org/)
+- [Tailwind](https://tailwindcss.com/)
 
 ## Install
-* `npm install`
+
+- `npm install`
 
 ## Develop
-* `npm run backend`
-* `npm run dev`
+
+- `npm run backend`
+- `npm run dev`
 
 ## Build
-* `npm run build`
+
+- `npm run build`

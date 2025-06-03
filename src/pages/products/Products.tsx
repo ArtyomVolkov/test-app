@@ -1,35 +1,37 @@
 import './Products.css';
 
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { clsx } from 'clsx';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
+import { Currency } from '@/lib/utils';
 import productsApi from '@/api/products';
 
 const ProductsPage = () => {
   const queryClient = useQueryClient();
   const navigation = useNavigate();
-  const { data, isError, isFetching } = useQuery({
+  const { data, isError, error, isFetching } = useQuery({
     queryKey: ['products'],
-    staleTime: Infinity,
-    refetchOnWindowFocus: false,
     queryFn: productsApi.fetchProducts,
   });
 
   const updateMutation = useMutation({
     mutationFn: productsApi.updateProduct,
-    onSuccess: () => {
-      console.log('update success');
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['products'] });
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: productsApi.deleteProduct,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('Delete product success');
     },
   });
 
@@ -42,7 +44,6 @@ const ProductsPage = () => {
   };
 
   const onToggleProduct = async (id: string, checked: boolean | 'indeterminate') => {
-    console.log(id, checked);
     updateMutation.mutate({
       id,
       data: {
@@ -51,7 +52,7 @@ const ProductsPage = () => {
     });
   };
 
-  if (isFetching) {
+  if (!data && isFetching) {
     return (
       <div className="loading-box">
         <span>Products loading...</span>
@@ -61,18 +62,32 @@ const ProductsPage = () => {
 
   if (isError) {
     return (
-      <div className="error-box">
-        <span>Error</span>
+      <div className="product-list-page">
+        <Alert variant="destructive">
+          <AlertTitle>
+            Error
+          </AlertTitle>
+          <AlertDescription>
+            {error?.message}
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
 
   return (
-    <div className="product-list">
+    <div className="product-list-page">
       <section className="panel">
         <Button onClick={onAddNewItem}>New Product</Button>
       </section>
       <ul className="list-items">
+        {!data?.length && (
+          <Alert>
+            <AlertTitle>
+              No Products
+            </AlertTitle>
+          </Alert>
+        )}
         {data?.map((item) => (
           <li key={item.id} className="list-item">
             <Checkbox
@@ -88,9 +103,9 @@ const ProductsPage = () => {
             >
               {item.title}
             </Label>
-            <Label>{item.price}</Label>
-            <Button onClick={() => navigation(`/products/${item.id}`)}>Edit</Button>
-            <Button onClick={() => onRemoveProduct(item.id)}>Remove</Button>
+            <Label>{Currency.format(item.price)}</Label>
+            <Button disabled={item.checked} onClick={() => navigation(`/products/${item.id}`)}>Edit</Button>
+            <Button disabled={item.checked} onClick={() => onRemoveProduct(item.id)}>Remove</Button>
           </li>
         ))}
       </ul>

@@ -1,15 +1,16 @@
 {
   "products": [
     {
-      "id": "1748897894263",
-      "title": "Artem",
-      "price": "123",
-      "checked": true
+      "id": "1748937879639",
+      "title": "ads",
+      "price": "01",
+      "checked": false
     },
     {
-      "id": "1748899256930",
-      "title": "test",
-      "price": "100"
+      "id": "1748938398174",
+      "title": "as3231",
+      "price": "123",
+      "checked": true
     }
   ]
 }

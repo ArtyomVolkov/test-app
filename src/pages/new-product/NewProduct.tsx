@@ -1,8 +1,9 @@
 import './NewProduct.css';
 
 import { useState, type ChangeEvent, type MouseEvent } from 'react';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +11,7 @@ import productsApi from '@/api/products';
 
 const NewProduct = () => {
   const navigation = useNavigate();
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     title: '',
     price: 0,
@@ -17,6 +19,10 @@ const NewProduct = () => {
 
   const addMutation = useMutation({
     mutationFn: productsApi.addProduct,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('Create products success');
+    },
   });
 
   const onChangeFormField = (event: ChangeEvent<HTMLInputElement>) => {
@@ -31,7 +37,7 @@ const NewProduct = () => {
 
     await addMutation.mutate({
       id: Date.now().toString(),
-      title: formData.title,
+      title: formData.title.trim(),
       price: formData.price,
     });
     navigation('/products');
@@ -49,7 +55,7 @@ const NewProduct = () => {
           <Label htmlFor="product-price">Price</Label>
           <Input type="number" id="price" name="price" onChange={onChangeFormField} />
         </div>
-        <Button type="submit" onClick={onSubmit}>
+        <Button type="submit" onClick={onSubmit} disabled={!formData.title.trim().length}>
           Add Product
         </Button>
       </form>
