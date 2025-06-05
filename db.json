@@ -2,8 +2,8 @@
   "products": [
     {
       "id": "1748937879639",
-      "title": "ads",
-      "price": "01",
+      "title": "Product 1123",
+      "price": "1001",
       "checked": false
     },
     {
@@ -11,6 +11,12 @@
       "title": "as3231",
       "price": "123",
       "checked": true
+    },
+    {
+      "id": "1749116794754",
+      "title": "Test product 7",
+      "price": "120",
+      "checked": false
     }
   ]
 }

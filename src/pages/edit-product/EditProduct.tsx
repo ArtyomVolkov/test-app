@@ -1,21 +1,16 @@
 import './EditProduct.css';
-import { useEffect, useState, type ChangeEvent, type MouseEvent } from 'react';
 import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import productsApi from '@/api/products';
+import ProductForm from '@/shared/components/forms/ProductForm';
+import type { Product } from '@/shared/types/product';
+import { useEffect } from 'react';
 
 const EditProduct = () => {
   const queryClient = useQueryClient();
   const navigation = useNavigate();
   const params = useParams();
-  const [formData, setFormData] = useState({
-    title: '',
-    price: 0,
-  });
 
   const productQuery = useQuery({
     queryKey: ['products', params.id],
@@ -24,8 +19,15 @@ const EditProduct = () => {
     },
   });
 
+  useEffect(() => {
+    if (!productQuery.isLoading && !productQuery.data) {
+      toast.error('Product not found');
+      navigation('/products');
+    }
+  }, [productQuery.isLoading, productQuery.data]);
+
   const updateMutation = useMutation({
-    mutationFn: async (data: { id: string; data: Partial<typeof formData> }) => {
+    mutationFn: async (data: { id: string; data: Partial<Product> }) => {
       return await productsApi.updateProduct(data);
     },
     onSuccess: async () => {
@@ -35,50 +37,27 @@ const EditProduct = () => {
     },
   });
 
-  useEffect(() => {
-    if (productQuery.data) {
-      setFormData({
-        title: productQuery.data.title,
-        price: productQuery.data.price,
-      });
-    }
-  }, [productQuery.data]);
-
-  const onChangeFormField = (event: ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [event.target.name]: event.target.value,
+  const onSubmit = async (product: Partial<Product>) => {
+    updateMutation.mutate({
+      id: params.id as string,
+      data: product,
     });
   };
 
-  const onSubmit = async (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
+  const renderProduct = () => {
+    if (productQuery.isLoading) {
+      return <p>Loading...</p>;
+    }
 
-    updateMutation.mutate({
-      id: params.id as string,
-      data: {
-        title: formData.title,
-        price: formData.price,
-      },
-    });
+    if (productQuery.data) {
+      return <ProductForm formData={productQuery.data} onSubmit={onSubmit} />;
+    }
   };
 
   return (
     <div className="edit-product-page">
       <h1>Update Product</h1>
-      <form className="new-product-form">
-        <div className="form-group">
-          <Label htmlFor="title">Product Name</Label>
-          <Input id="title" name="title" value={formData.title} onChange={onChangeFormField} />
-        </div>
-        <div className="form-group">
-          <Label htmlFor="product-price">Price</Label>
-          <Input type="number" id="price" name="price" value={formData.price} onChange={onChangeFormField} />
-        </div>
-        <Button type="submit" onClick={onSubmit}>
-          Update product
-        </Button>
-      </form>
+      {renderProduct()}
     </div>
   );
 };
